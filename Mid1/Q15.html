@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Cardinal Spline with Control Points</title>
+<style>
+canvas {
+    border: 1px solid #000;
+    margin-top: 10px;
+}
+</style>
+</head>
+<body>
+
+<h2>Cardinal Spline</h2>
+<canvas id="cardinalSpline" width="400" height="400"></canvas>
+
+<script>
+// Function to draw grid
+function drawGrid(ctx) {
+    const gridSize = 50;
+    const width = ctx.canvas.width;
+    const height = ctx.canvas.height;
+    ctx.beginPath();
+    ctx.strokeStyle = '#ddd';
+
+    // Draw horizontal grid lines
+    for (let i = 0; i < height; i += gridSize) {
+        ctx.moveTo(0, i);
+        ctx.lineTo(width, i);
+    }
+    // Draw vertical grid lines
+    for (let i = 0; i < width; i += gridSize) {
+        ctx.moveTo(i, 0);
+        ctx.lineTo(i, height);
+    }
+    ctx.stroke();
+    ctx.closePath();
+}
+
+// Draw Cardinal Spline with control points
+function drawCardinalSpline(ctx, points) {
+    ctx.strokeStyle = '#f00';
+    ctx.beginPath();
+    ctx.moveTo(points[0][0], points[0][1]); // Start at the first control point
+
+    // Draw Spline through each segment
+    for (var i = 1; i < points.length - 2; i++) {
+        var p0 = points[i - 1];
+        var p1 = points[i];
+        var p2 = points[i + 1];
+        var p3 = points[i + 2];
+
+        for (var t = 0; t < 1; t += 0.02) {
+            var t2 = t * t;
+            var t3 = t2 * t;
+            var tension = 0.5;  // Catmull-Rom Spline
+
+            var q0 = -tension * t3 + 2 * tension * t2 - tension * t;
+            var q1 = (2 - tension) * t3 + (tension - 3) * t2 + 1;
+            var q2 = (tension - 2) * t3 + (3 - 2 * tension) * t2 + tension * t;
+            var q3 = tension * t3 - tension * t2;
+
+            var tx = q0 * p0[0] + q1 * p1[0] + q2 * p2[0] + q3 * p3[0];
+            var ty = q0 * p0[1] + q1 * p1[1] + q2 * p2[1] + q3 * p3[1];
+
+            ctx.lineTo(tx, ty);
+        }
+    }
+    ctx.stroke();
+}
+
+// Setup canvas and context
+var canvas = document.getElementById('cardinalSpline');
+var ctx = canvas.getContext('2d');
+
+// Flip the y-axis to make (0,0) the bottom-left corner
+ctx.transform(1, 0, 0, -1, 50, ctx.canvas.height - 20);
+
+// Draw the grid
+drawGrid(ctx);
+
+// Control points for Cardinal Spline, adding two extra points for drawing
+var splinePoints = [
+    [300, 300], // extra point for drawing
+    [300, 300],
+    [0, 0],
+    [0, 300],
+    [300, 0],
+    [300, 0] // extra point for drawing
+];
+
+// Draw the spline
+drawCardinalSpline(ctx, splinePoints);
+
+// Draw control points
+ctx.fillStyle = '#00f';
+splinePoints.forEach(function(point) {
+    ctx.beginPath();
+    ctx.arc(point[0], point[1], 5, 0, Math.PI * 2);
+    ctx.fill();
+});
+
+
+</script>
+
+</body>
+</html>

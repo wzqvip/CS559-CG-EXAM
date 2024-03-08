@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Bezier Curves with Control Points, Tangents, and Grid</title>
+<style>
+canvas {
+    border:1px solid #000;
+    margin-top: 10px;
+}
+</style>
+</head>
+<body>
+
+<h2>Quadratic Bezier Curve</h2>
+<canvas id="quadraticCurve" width="400" height="400"></canvas>
+
+<h2>Cubic Bezier Curve</h2>
+<canvas id="cubicCurve" width="400" height="400"></canvas>
+
+<script>
+// Function to draw grid
+function drawGrid(ctx) {
+    const gridSize = 50;
+    const width = ctx.canvas.width;
+    const height = ctx.canvas.height;
+    ctx.beginPath();
+    ctx.strokeStyle = '#ddd';
+    
+    // Draw horizontal grid lines
+    for (let i = 0; i < height; i += gridSize) {
+        ctx.moveTo(0, i);
+        ctx.lineTo(width, i);
+    }
+    // Draw vertical grid lines
+    for (let i = 0; i < width; i += gridSize) {
+        ctx.moveTo(i, 0);
+        ctx.lineTo(i, height);
+    }
+    ctx.stroke();
+    ctx.closePath();
+}
+
+// Function to draw control points and lines
+function drawControlPointsAndLines(ctx, points) {
+    // Draw control points
+    points.forEach(point => {
+        ctx.beginPath();
+        ctx.arc(point[0], 400 - point[1], 5, 0, Math.PI * 2);
+        ctx.fill();
+    });
+
+    // Draw control lines
+    ctx.beginPath();
+    ctx.moveTo(points[0][0], 400 - points[0][1]);
+    for (let i = 1; i < points.length; i++) {
+        ctx.lineTo(points[i][0], 400 - points[i][1]);
+    }
+    ctx.stroke();
+}
+
+// Draw Quadratic Bezier Curve with control points
+function drawQuadraticBezierCurve(ctx, controlPoints) {
+    ctx.beginPath();
+    ctx.moveTo(controlPoints[0][0], 400 - controlPoints[0][1]); // Move to start point
+    ctx.quadraticCurveTo(
+        controlPoints[1][0], 400 - controlPoints[1][1], // Control point
+        controlPoints[2][0], 400 - controlPoints[2][1]  // End point
+    );
+    ctx.stroke();
+    drawControlPointsAndLines(ctx, controlPoints);
+}
+
+// Draw Cubic Bezier Curve that matches the quadratic one
+function drawCubicBezierCurve(ctx, controlPoints) {
+    ctx.beginPath();
+    ctx.moveTo(controlPoints[0][0], 400 - controlPoints[0][1]); // Move to start point
+    ctx.bezierCurveTo(
+        controlPoints[1][0], 400 - controlPoints[1][1], // First control point
+        controlPoints[2][0], 400 - controlPoints[2][1], // Second control point
+        controlPoints[3][0], 400 - controlPoints[3][1]  // End point
+    );
+    ctx.stroke();
+    drawControlPointsAndLines(ctx, controlPoints);
+}
+
+// Control points for quadratic and cubic Bezier curves
+const quadraticControlPoints = [[0, 0], [0, 300], [300, 300]];
+const cubicControlPoints = [[0, 0], [0, 200], [100, 300], [300, 300]];
+
+// Get canvas contexts
+var quadraticCtx = document.getElementById('quadraticCurve').getContext('2d');
+var cubicCtx = document.getElementById('cubicCurve').getContext('2d');
+
+// Flip the y-axis to make (0,0) the bottom-left corner
+quadraticCtx.transform(1, 0, 0, -1, 10, quadraticCtx.canvas.height + 30);
+cubicCtx.transform(1, 0, 0, -1, 10, cubicCtx.canvas.height + 30);
+
+// Draw the grid
+drawGrid(quadraticCtx);
+drawGrid(cubicCtx);
+
+// Style for control points and lines
+quadraticCtx.fillStyle = 'red';
+quadraticCtx.strokeStyle = 'blue';
+cubicCtx.fillStyle = 'red';
+cubicCtx.strokeStyle = 'blue';
+
+// Draw the quadratic curve
+drawQuadraticBezierCurve(quadraticCtx, quadraticControlPoints);
+
+// Draw the cubic curve
+drawCubicBezierCurve(cubicCtx, cubicControlPoints);
+</script>
+
+</body>
+</html>
